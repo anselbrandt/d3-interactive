@@ -9,10 +9,10 @@ function App() {
   const width = viewportWidth * 0.5;
   const height = viewportHeight * 0.5;
   const svgRef = useRef();
-  const [pointer, setPointer] = useState();
+  const [values, setValues] = useState();
 
   useEffect(() => {
-    const axisColor = "gray";
+    const axisColor = "dimgray";
     const xTicks = 5;
     const yTicks = 3;
 
@@ -61,10 +61,29 @@ function App() {
       svg.selectAll("g").remove();
       svg.attr("width", `${width}px`).attr("height", `${height}px`);
 
+      const xRule = svg
+        .append("g")
+        .attr("stroke-width", 1)
+        .attr("display", "none");
+      xRule
+        .append("line")
+        .attr("x1", 0)
+        .attr("y1", 0)
+        .attr("x2", 0)
+        .attr("y2", height);
+      const yRule = svg
+        .append("g")
+        .attr("stroke-width", 1)
+        .attr("display", "none");
+      yRule
+        .append("line")
+        .attr("x1", 0)
+        .attr("y1", 0)
+        .attr("x2", width)
+        .attr("y2", 0);
+
       const dot = svg.append("g").attr("display", "none");
-
       dot.append("circle").attr("r", 2.5);
-
       dot
         .append("text")
         .attr("font-family", "sans-serif")
@@ -73,44 +92,37 @@ function App() {
         .attr("y", -8);
 
       const entered = () => {
+        console.log("entered");
         svg
-          .selectAll("path")
+          .selectAll(".line")
           .style("mix-blend-mode", null)
           .attr("stroke", "#ddd");
         dot.attr("display", null);
+        xRule.attr("display", null).attr("stroke", "gray");
+        yRule.attr("display", null).attr("stroke", "gray");
       };
 
       const left = () => {
+        console.log("left");
         svg
-          .selectAll("path")
+          .selectAll(".line")
           .style("mix-blend-mode", "multiply")
           .attr("stroke", null);
         dot.attr("display", "none");
+        xRule.attr("display", "none");
+        yRule.attr("display", "none");
       };
 
       const moved = (event) => {
         event.preventDefault();
         const cursorPosition = pointers(event)[0];
-        setPointer(cursorPosition);
-        // // date
-        // const xm = xScale.invert(cursorPosition[0]);
-        // // unemployment %
-        // const ym = yScale.invert(cursorPosition[1]);
-        // // index
-        // const i = bisectCenter(data.dates, xm);
-        // // data object
-        // const s = least(data.series, (d) => Math.abs(d.values[i] - ym));
-
-        // svg
-        //   .selectAll("path")
-        //   .attr("stroke", (d) => (d === s ? null : "#ddd"))
-        //   .filter((d) => d === s)
-        //   .raise();
-        // dot.attr(
-        //   "transform",
-        //   `translate(${x(data.dates[i])},${y(s.values[i])})`
-        // );
-        // dot.select("text").text(s.name);
+        const [x, y] = cursorPosition;
+        setValues([xScale.invert(x), yScale.invert(y)]);
+        dot.attr("transform", `translate(${x},${y})`);
+        const label = `${x.toFixed(0)}, ${y.toFixed(0)}`;
+        dot.select("text").text(label);
+        xRule.attr("transform", `translate(${x},0)`);
+        yRule.attr("transform", `translate(0,${y})`);
       };
 
       const rect = (g) =>
@@ -138,8 +150,10 @@ function App() {
           .selectAll("path")
           .data([data])
           .join("path")
+          .attr("class", "line")
           .style("mix-blend-mode", "multiply")
-          .attr("d", (d) => getLine(d));
+          .attr("d", (d) => getLine(d))
+          .attr("pointer-events", "none");
       };
 
       svg.call(path);
@@ -155,7 +169,7 @@ function App() {
         <g className="yAxis" />
       </svg>
       <div style={{ marginTop: 30 }}>
-        {pointer ? `${pointer[0].toFixed(0)}, ${pointer[1].toFixed(0)}` : null}
+        {values ? `${values[0].toFixed(0)}, ${values[1].toFixed(0)}` : "0, 0"}
       </div>
     </div>
   );
