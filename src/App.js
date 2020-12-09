@@ -98,8 +98,8 @@ function App() {
           .style("mix-blend-mode", null)
           .attr("stroke", "#ddd");
         dot.attr("display", null);
-        xRule.attr("display", null).attr("stroke", "gray");
-        yRule.attr("display", null).attr("stroke", "gray");
+        xRule.attr("display", null).attr("stroke", "tomato");
+        yRule.attr("display", null).attr("stroke", "tomato");
       };
 
       const left = () => {
