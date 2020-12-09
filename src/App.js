@@ -164,6 +164,12 @@ function App() {
   return (
     <div className="App">
       <div className="Title">Interactive Chart</div>
+      <div className="SubTitle" style={{ marginBottom: 30 }}>
+        More on{" "}
+        <a href="https://observablehq.com/@d3/multitouch">
+          Multitouch done right
+        </a>
+      </div>
       <svg ref={svgRef} overflow="visible">
         <g className="xAxis" />
         <g className="yAxis" />
