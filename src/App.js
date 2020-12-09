@@ -117,7 +117,7 @@ function App() {
         event.preventDefault();
         const cursorPosition = pointers(event)[0];
         const [x, y] = cursorPosition;
-        setValues([xScale.invert(x), yScale.invert(y)]);
+        setValues([getValue(xScale.invert(x)), getValue(yScale.invert(y))]);
         dot.attr("transform", `translate(${x},${y})`);
         const label = `${x.toFixed(0)}, ${y.toFixed(0)}`;
         dot.select("text").text(label);
@@ -175,7 +175,7 @@ function App() {
         <g className="yAxis" />
       </svg>
       <div style={{ marginTop: 30 }}>
-        {values ? `${values[0].toFixed(0)}, ${values[1].toFixed(0)}` : "0, 0"}
+        {values ? `${values[0]}, ${values[1]}` : "0, 0"}
       </div>
     </div>
   );
