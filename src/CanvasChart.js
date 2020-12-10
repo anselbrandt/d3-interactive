@@ -109,7 +109,6 @@ function CanvasChart() {
         if (["mousedown", "pointerdown", "touchstart"].includes(type))
           setIsDown(true);
         if (type === "click") {
-          // setIsClicked((prev) => !prev);
           setIsClicked(true);
           setPosition(pointers(event)[0]);
           setValues([getValue(xScale.invert(x)), getValue(yScale.invert(y))]);
