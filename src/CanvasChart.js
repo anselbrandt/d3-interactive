@@ -1,15 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
-import {
-  select,
-  line,
-  axisBottom,
-  axisLeft,
-  scaleLinear,
-  pointers,
-  area,
-  curveBasis,
-} from "d3";
+import { select, line, scaleLinear, pointers } from "d3";
 import useGetViewport from "./useGetViewport";
 import { data } from "./data";
 
@@ -26,6 +17,11 @@ function CanvasChart() {
   const [values, setValues] = useState();
 
   useEffect(() => {
+    const color = "steelblue";
+    // const axisColor = "gray";
+    const xTicks = 5;
+    const yTicks = 3;
+
     const canvas = canvasRef.current;
     canvas.style.width = width + "px";
     canvas.style.height = height + "px";
@@ -35,11 +31,6 @@ function CanvasChart() {
 
     const context = canvas.getContext("2d");
     context.scale(scale, scale);
-
-    const color = "steelblue";
-    const axisColor = "gray";
-    const xTicks = 5;
-    const yTicks = 3;
 
     const xValues = data.map((value) => value[0]);
     const yValues = data.map((value) => value[1]);
@@ -68,14 +59,62 @@ function CanvasChart() {
     const xScale = scaleLinear().domain(domain).range([0, width]);
     const yScale = scaleLinear().domain(range).range([height, 0]);
 
-    // const xAxis = (g) =>
-    //   g
-    //     .attr("transform", `translate(0,${height})`)
-    //     .attr("color", axisColor)
-    //     .call(axisBottom(xScale).ticks(xTicks));
+    const xAxis = () => {
+      const tickSize = 6;
+      const ticks = xScale.ticks(xTicks);
+      const tickFormat = xScale.tickFormat();
 
-    // const yAxis = (g) =>
-    //   g.attr("color", axisColor).call(axisLeft(yScale).ticks(yTicks));
+      context.beginPath();
+      ticks.forEach((d) => {
+        context.moveTo(xScale(d), height);
+        context.lineTo(xScale(d), height + tickSize);
+      });
+      context.strokeStyle = "black";
+      context.stroke();
+
+      context.textAlign = "center";
+      context.textBaseline = "top";
+      ticks.forEach((d) => {
+        context.fillText(tickFormat(d), xScale(d), height + tickSize);
+      });
+    };
+
+    const yAxis = () => {
+      const tickSize = 6;
+      const tickPadding = 3;
+      const ticks = yScale.ticks(yTicks);
+      const tickFormat = yScale.tickFormat(yTicks);
+
+      context.beginPath();
+      ticks.forEach((d) => {
+        context.moveTo(0, yScale(d));
+        context.lineTo(-6, yScale(d));
+      });
+      context.strokeStyle = "black";
+      context.stroke();
+
+      context.beginPath();
+      context.moveTo(-tickSize, 0);
+      context.lineTo(0.5, 0);
+      context.lineTo(0.5, height);
+      context.lineTo(-tickSize, height);
+      context.strokeStyle = "black";
+      context.stroke();
+
+      context.textAlign = "right";
+      context.textBaseline = "middle";
+      ticks.forEach((d) => {
+        context.fillText(tickFormat(d), -tickSize - tickPadding, yScale(d));
+      });
+
+      //   context.save();
+      //   context.rotate(-Math.PI / 2);
+      //   context.textAlign = "right";
+      //   context.textBaseline = "top";
+      //   context.font = "bold 10px sans-serif";
+      //   context.fillText("Value", -10, 10);
+      //   context.restore();
+    };
 
     const getLine = line()
       .x((value) => xScale(value[0]))
@@ -175,6 +214,9 @@ function CanvasChart() {
     function draw() {
       context.clearRect(0, 0, canvas.width, canvas.height);
 
+      xAxis();
+      yAxis();
+
       context.beginPath();
       getLine(data);
       context.lineWidth = 1.5;
@@ -204,7 +246,16 @@ function CanvasChart() {
     }
     requestAnimationFrame(draw);
     return () => cancelAnimationFrame(draw);
-  }, [width, height, canvasRef, pointer, isEntered]);
+  }, [
+    width,
+    height,
+    canvasRef,
+    pointer,
+    position,
+    isEntered,
+    isDown,
+    isClicked,
+  ]);
 
   return (
     <div className="App">
