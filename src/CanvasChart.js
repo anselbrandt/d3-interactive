@@ -117,12 +117,9 @@ function CanvasChart() {
         if (["mousemove", "touchmove", "pointermove"].includes(type)) {
           if (withinBounds(x, y)) {
             setPointer(pointers(event)[0]);
+            setValues([getValue(xScale.invert(x)), getValue(yScale.invert(y))]);
             if (!isClicked) {
               setPosition(pointers(event)[0]);
-              setValues([
-                getValue(xScale.invert(x)),
-                getValue(yScale.invert(y)),
-              ]);
             }
           }
         }
@@ -133,7 +130,6 @@ function CanvasChart() {
           setIsEntered(false);
           setIsDown(false);
           setPointer(null);
-          if (!isClicked) setPosition(null);
         }
       }
     };
