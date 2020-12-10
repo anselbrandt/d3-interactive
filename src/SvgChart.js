@@ -9,11 +9,8 @@ function SvgChart() {
   const width = viewportWidth * 0.5;
   const height = viewportHeight * 0.5;
   const svgRef = useRef();
-  const [isDown, setIsDown] = useState(false);
-  const [isEntered, setIsEntered] = useState(false);
-  const [position, setPosition] = useState();
-  const [pointer, setPointer] = useState();
-  const [isClicked, setIsClicked] = useState(false);
+  const isClicked = useRef(false);
+  const position = useRef();
   const [values, setValues] = useState();
 
   useEffect(() => {
@@ -89,14 +86,9 @@ function SvgChart() {
 
       const dot = svg.append("g").attr("display", "none");
       dot.append("circle").attr("r", 2.5);
-      dot
-        .append("text")
-        .attr("font-family", "sans-serif")
-        .attr("font-size", 10)
-        .attr("text-anchor", "middle")
-        .attr("y", -8);
 
       const onEnter = () => {
+        isClicked.current = false;
         svg
           .selectAll(".line")
           .style("mix-blend-mode", null)
@@ -106,12 +98,16 @@ function SvgChart() {
         yRule.attr("display", null).attr("stroke", "steelblue");
       };
 
-      const onDown = (event) => {
-        console.log("down");
-      };
+      const onDown = () => {};
 
       const onClick = (event) => {
-        console.log("clicked");
+        const cursorPosition = pointers(event)[0];
+        const [x, y] = cursorPosition;
+        if (position.current) {
+          dot.attr("transform", `translate(${x},${y})`);
+        }
+        isClicked.current = true;
+        position.current = cursorPosition;
       };
 
       const onMove = (event) => {
@@ -119,11 +115,11 @@ function SvgChart() {
         const cursorPosition = pointers(event)[0];
         const [x, y] = cursorPosition;
         setValues([getValue(xScale.invert(x)), getValue(yScale.invert(y))]);
-        dot.attr("transform", `translate(${x},${y})`);
-        const label = `${x.toFixed(0)}, ${y.toFixed(0)}`;
-        dot.select("text").text(label);
         xRule.attr("transform", `translate(${x},0)`);
         yRule.attr("transform", `translate(0,${y})`);
+        if (!isClicked.current) {
+          dot.attr("transform", `translate(${x},${y})`);
+        }
       };
 
       const onUp = () => {};
@@ -133,7 +129,9 @@ function SvgChart() {
           .selectAll(".line")
           .style("mix-blend-mode", "multiply")
           .attr("stroke", null);
-        dot.attr("display", "none");
+        if (!isClicked.current) {
+          dot.attr("display", "none");
+        }
         xRule.attr("display", "none");
         yRule.attr("display", "none");
       };
