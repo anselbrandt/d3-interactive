@@ -149,7 +149,7 @@ function CanvasChart() {
         x: position ? position[0] : 0,
         y: position ? position[1] : 0,
         color: color,
-        radius: 2.5,
+        radius: position ? 2.5 : 0,
       },
     ];
 
@@ -182,15 +182,15 @@ function CanvasChart() {
       context.strokeStyle = isEntered ? "#ddd" : color;
       context.stroke();
 
-      if (isEntered) {
-        for (const { x, y, color, radius } of circles) {
-          context.beginPath();
-          context.moveTo(x + radius, y);
-          context.arc(x, y, radius, 0, 2 * Math.PI);
-          context.fillStyle = color;
-          context.fill();
-        }
+      for (const { x, y, color, radius } of circles) {
+        context.beginPath();
+        context.moveTo(x + radius, y);
+        context.arc(x, y, radius, 0, 2 * Math.PI);
+        context.fillStyle = color;
+        context.fill();
+      }
 
+      if (isEntered) {
         for (const { x1, y1, x2, y2, color } of lines) {
           context.beginPath();
           context.moveTo(x1, y1);
