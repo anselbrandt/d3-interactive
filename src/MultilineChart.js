@@ -17,7 +17,7 @@ import {
 } from "d3";
 import useGetViewport from "./useGetViewport";
 
-function App() {
+function MultilineChart() {
   const { width: viewportWidth, height: viewportHeight } = useGetViewport();
   const width = viewportWidth * 0.5;
   const height = viewportHeight * 0.5;
@@ -185,7 +185,7 @@ function App() {
   return (
     <div className="App">
       <div className="Title">Multi-Line Chart</div>
-      <div className="SubTitle">
+      <div className="SubTitle" style={{ marginBottom: 30 }}>
         <a href="https://observablehq.com/@d3/multi-line-chart">
           Observable Example
         </a>{" "}
@@ -199,4 +199,4 @@ function App() {
   );
 }
 
-export default App;
+export default MultilineChart;
