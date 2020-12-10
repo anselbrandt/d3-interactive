@@ -151,7 +151,7 @@ function CanvasChart() {
         x: position ? position[0] : 0,
         y: position ? position[1] : 0,
         color: color,
-        radius: 5,
+        radius: 2.5,
       },
     ];
 
@@ -178,30 +178,33 @@ function CanvasChart() {
       context.beginPath();
       getLine(data);
       context.lineWidth = 1.5;
-      context.strokeStyle = color;
+      context.strokeStyle = isEntered ? "#ddd" : color;
       context.stroke();
 
-      for (const { x, y, color, radius } of circles) {
-        context.beginPath();
-        context.moveTo(x + radius, y);
-        context.arc(x, y, radius, 0, 2 * Math.PI);
-        context.fillStyle = color;
-        context.fill();
-      }
+      if (isEntered) {
+        for (const { x, y, color, radius } of circles) {
+          context.beginPath();
+          context.moveTo(x + radius, y);
+          context.arc(x, y, radius, 0, 2 * Math.PI);
+          context.fillStyle = color;
+          context.fill();
+        }
 
-      for (const { x1, y1, x2, y2, color } of lines) {
-        context.beginPath();
-        context.moveTo(x1, y1);
-        context.lineTo(x2, y2);
-        context.strokeStyle = color;
-        context.stroke();
+        for (const { x1, y1, x2, y2, color } of lines) {
+          context.beginPath();
+          context.moveTo(x1, y1);
+          context.lineTo(x2, y2);
+          context.lineWidth = 1;
+          context.strokeStyle = color;
+          context.stroke();
+        }
       }
 
       requestAnimationFrame(draw);
     }
     requestAnimationFrame(draw);
     return () => cancelAnimationFrame(draw);
-  }, [width, height, canvasRef, pointer]);
+  }, [width, height, canvasRef, pointer, isEntered]);
 
   return (
     <div className="App">
