@@ -133,6 +133,7 @@ function CanvasChart() {
           setIsEntered(false);
           setIsDown(false);
           setPointer(null);
+          if (!isClicked) setPosition(null);
         }
       }
     };

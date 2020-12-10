@@ -93,7 +93,7 @@ function SvgChart() {
           .selectAll(".line")
           .style("mix-blend-mode", null)
           .attr("stroke", "#ddd");
-        dot.attr("display", null);
+        dot.attr("display", null).attr("fill", "steelblue");
         xRule.attr("display", null).attr("stroke", "steelblue");
         yRule.attr("display", null).attr("stroke", "steelblue");
       };
