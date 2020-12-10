@@ -9,6 +9,11 @@ function SvgChart() {
   const width = viewportWidth * 0.5;
   const height = viewportHeight * 0.5;
   const svgRef = useRef();
+  const [isDown, setIsDown] = useState(false);
+  const [isEntered, setIsEntered] = useState(false);
+  const [position, setPosition] = useState();
+  const [pointer, setPointer] = useState();
+  const [isClicked, setIsClicked] = useState(false);
   const [values, setValues] = useState();
 
   useEffect(() => {
@@ -91,8 +96,7 @@ function SvgChart() {
         .attr("text-anchor", "middle")
         .attr("y", -8);
 
-      const entered = () => {
-        console.log("entered");
+      const onEnter = () => {
         svg
           .selectAll(".line")
           .style("mix-blend-mode", null)
@@ -102,18 +106,15 @@ function SvgChart() {
         yRule.attr("display", null).attr("stroke", "steelblue");
       };
 
-      const left = () => {
-        console.log("left");
-        svg
-          .selectAll(".line")
-          .style("mix-blend-mode", "multiply")
-          .attr("stroke", null);
-        dot.attr("display", "none");
-        xRule.attr("display", "none");
-        yRule.attr("display", "none");
+      const onDown = (event) => {
+        console.log("down");
       };
 
-      const moved = (event) => {
+      const onClick = (event) => {
+        console.log("clicked");
+      };
+
+      const onMove = (event) => {
         event.preventDefault();
         const cursorPosition = pointers(event)[0];
         const [x, y] = cursorPosition;
@@ -125,15 +126,30 @@ function SvgChart() {
         yRule.attr("transform", `translate(0,${y})`);
       };
 
+      const onUp = () => {};
+
+      const onOut = () => {
+        svg
+          .selectAll(".line")
+          .style("mix-blend-mode", "multiply")
+          .attr("stroke", null);
+        dot.attr("display", "none");
+        xRule.attr("display", "none");
+        yRule.attr("display", "none");
+      };
+
       const rect = (g) =>
         g
           .append("rect")
           .attr("fill", "transparent")
           .attr("width", width)
           .attr("height", height)
-          .on("mousemove", moved)
-          .on("mouseenter", entered)
-          .on("mouseleave", left);
+          .on("mouseenter pointerenter", onEnter)
+          .on("mousedown pointerdown touchstart", onDown)
+          .on("click", onClick)
+          .on("mousemove touchmove pointermove", onMove)
+          .on("mouseup pointerup pointermove", onUp)
+          .on("mouseout pointerout", onOut);
 
       svg.append("g").call(xAxis);
       svg.append("g").call(yAxis);
