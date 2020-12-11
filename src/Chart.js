@@ -9,6 +9,7 @@ function SvgChart() {
   const width = viewportWidth * 0.5;
   const height = viewportHeight * 0.5;
   const svgRef = useRef();
+  const pointer = useRef();
   const position = useRef();
   const isSet = useRef();
   const [values, setValues] = useState();
@@ -115,15 +116,18 @@ function SvgChart() {
           dot.attr("display", null).attr("fill", "steelblue");
         }
         if (["touchstart", "mousedown"].includes(type)) {
+          console.log("start");
           svg.selectAll(".line").attr("stroke", "#ddd");
           xRule.attr("display", null).attr("stroke", "steelblue");
           yRule.attr("display", null).attr("stroke", "steelblue");
           dot.attr("display", null).attr("fill", "steelblue");
         }
         if (["touchmove", "mousemove"].includes(type)) {
+          console.log("moving");
           const [x, y] = pointers(event)[0];
           if (withinBounds([x, y])) {
             setValues([x, y]);
+            pointer.current = [x, y];
             position.current = [x, y];
             xRule.attr("transform", `translate(${x},0)`);
             yRule.attr("transform", `translate(0,${y})`);
@@ -135,13 +139,19 @@ function SvgChart() {
           }
         }
         if (["touchend", "click", "mouseup"].includes(type)) {
+          console.log("end");
+          if (position.current && isSet.current) {
+            const [x, y] = pointer.current;
+            dot.attr("transform", `translate(${x},${y})`);
+            isSet.current = true;
+          }
           if (position.current && !isSet.current) {
             isSet.current = true;
           }
-          if (position.current && isSet.current) {
-            const [x, y] = pointers(event)[0];
-            dot.attr("transform", `translate(${x},${y})`);
-            isSet.current = true;
+          if (!pointers(event)[0]) {
+            svg.selectAll(".line").attr("stroke", "steelblue");
+            xRule.attr("display", "none");
+            yRule.attr("display", "none");
           }
         }
         if (["mouseout"].includes(type)) {
@@ -163,8 +173,9 @@ function SvgChart() {
           .on(
             "click " +
               "mouseenter mouseout mousedown mouseup mousemove " +
-              "touchstart touchend touchmove ",
-            onEvent
+              "touchstart touchend touchmove",
+            onEvent,
+            false
           );
 
       svg.append("g").call(xAxis);
@@ -191,7 +202,7 @@ function SvgChart() {
       svg.call(path);
     };
     chart();
-  }, [width, height, svgRef]);
+  }, [width, height, svgRef, isSet]);
 
   return (
     <div>
