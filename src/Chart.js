@@ -9,6 +9,8 @@ function SvgChart() {
   const width = viewportWidth * 0.5;
   const height = viewportHeight * 0.5;
   const svgRef = useRef();
+  const position = useRef();
+  const isSet = useRef();
   const [values, setValues] = useState();
 
   useEffect(() => {
@@ -106,30 +108,49 @@ function SvgChart() {
         }
         const type = event.type;
 
-        if (["mouseenter", "pointerenter"].includes(type)) {
+        if (["mouseenter"].includes(type)) {
           svg.selectAll(".line").attr("stroke", "#ddd");
           xRule.attr("display", null).attr("stroke", "steelblue");
           yRule.attr("display", null).attr("stroke", "steelblue");
           dot.attr("display", null).attr("fill", "steelblue");
         }
-        if (["mousedown", "pointerdown", "touchstart"].includes(type)) {
+        if (["touchstart", "mousedown"].includes(type)) {
+          svg.selectAll(".line").attr("stroke", "#ddd");
+          xRule.attr("display", null).attr("stroke", "steelblue");
+          yRule.attr("display", null).attr("stroke", "steelblue");
+          dot.attr("display", null).attr("fill", "steelblue");
         }
-        if (["mousemove", "pointermove", "touchmove"].includes(type)) {
+        if (["touchmove", "mousemove"].includes(type)) {
           const [x, y] = pointers(event)[0];
           if (withinBounds([x, y])) {
             setValues([x, y]);
+            position.current = [x, y];
             xRule.attr("transform", `translate(${x},0)`);
             yRule.attr("transform", `translate(0,${y})`);
-            dot.attr("transform", `translate(${x},${y})`);
+            if (!isSet.current) {
+              dot.attr("transform", `translate(${x},${y})`);
+            }
+          } else {
+            position.current = null;
           }
         }
-        if (["mouseup", "pointerup", "touchend", "click"].includes(type)) {
+        if (["touchend", "click", "mouseup"].includes(type)) {
+          if (position.current && !isSet.current) {
+            isSet.current = true;
+          }
+          if (position.current && isSet.current) {
+            const [x, y] = pointers(event)[0];
+            dot.attr("transform", `translate(${x},${y})`);
+            isSet.current = true;
+          }
+        }
+        if (["mouseout"].includes(type)) {
           svg.selectAll(".line").attr("stroke", "steelblue");
           xRule.attr("display", "none");
           yRule.attr("display", "none");
-          dot.attr("display", "none");
-        }
-        if (["mouseout", "pointerout"].includes(type)) {
+          if (!isSet.current) {
+            dot.attr("display", "none");
+          }
         }
       };
 
@@ -142,8 +163,7 @@ function SvgChart() {
           .on(
             "click " +
               "mouseenter mouseout mousedown mouseup mousemove " +
-              "touchstart touchend touchmove " +
-              "pointerenter pointerout pointerup pointerdown pointermove",
+              "touchstart touchend touchmove ",
             onEvent
           );
 

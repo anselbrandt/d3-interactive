@@ -102,18 +102,17 @@ function CanvasChart() {
       if (pointers(event) && pointers(event)[0]) {
         const [x, y] = pointers(event)[0];
 
-        if (["mouseenter", "pointerenter"].includes(type)) {
+        if (["mouseenter"].includes(type)) {
           setIsEntered(true);
           setIsClicked(false);
         }
-        if (["mousedown", "pointerdown", "touchstart"].includes(type))
-          setIsDown(true);
+        if (["touchstart", "mousedown"].includes(type)) setIsDown(true);
         if (type === "click") {
           setIsClicked(true);
           setPosition(pointers(event)[0]);
           setValues([getValue(xScale.invert(x)), getValue(yScale.invert(y))]);
         }
-        if (["mousemove", "touchmove", "pointermove"].includes(type)) {
+        if (["touchmove", "mousemove"].includes(type)) {
           if (withinBounds(x, y)) {
             setPointer(pointers(event)[0]);
             setValues([getValue(xScale.invert(x)), getValue(yScale.invert(y))]);
@@ -123,9 +122,8 @@ function CanvasChart() {
           }
         }
 
-        if (["mouseup", "pointerup", "touchend"].includes(type))
-          setIsDown(false);
-        if (["mouseout", "pointerout"].includes(type)) {
+        if (["touchend", "mouseup"].includes(type)) setIsDown(false);
+        if (["mouseout"].includes(type)) {
           setIsEntered(false);
           setIsDown(false);
           setPointer(null);
@@ -135,9 +133,8 @@ function CanvasChart() {
 
     select(context.canvas).on(
       "click " +
-        "mouseenter mouseout mousedown mouseup mousemove " +
         "touchstart touchend touchmove " +
-        "pointerenter pointerout pointerup pointerdown pointermove",
+        "mouseenter mouseout mousedown mouseup mousemove ",
       onEvent
     );
 
