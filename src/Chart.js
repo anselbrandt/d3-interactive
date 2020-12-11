@@ -98,9 +98,12 @@ function SvgChart() {
         yRule.attr("display", null).attr("stroke", "steelblue");
       };
 
-      const onDown = () => {};
+      const onDown = () => {
+        console.log("down");
+      };
 
       const onClick = (event) => {
+        console.log("click");
         const cursorPosition = pointers(event)[0];
         const [x, y] = cursorPosition;
         if (position.current) {
@@ -122,9 +125,12 @@ function SvgChart() {
         }
       };
 
-      const onUp = () => {};
+      const onUp = () => {
+        console.log("up");
+      };
 
       const onOut = () => {
+        console.log("out");
         svg
           .selectAll(".line")
           .style("mix-blend-mode", "multiply")
@@ -142,12 +148,12 @@ function SvgChart() {
           .attr("fill", "transparent")
           .attr("width", width)
           .attr("height", height)
-          .on("mouseenter pointerenter", onEnter)
-          .on("mousedown pointerdown touchstart", onDown)
-          .on("click", onClick)
+          .on("mouseenter pointerenter touchstart", onEnter)
+          .on("mousedown pointerdown", onDown)
+          .on("click touchend", onClick)
           .on("mousemove touchmove pointermove", onMove)
           .on("mouseup pointerup", onUp)
-          .on("mouseout pointerout touchend", onOut);
+          .on("mouseout pointerout", onOut);
 
       svg.append("g").call(xAxis);
       svg.append("g").call(yAxis);
@@ -176,18 +182,8 @@ function SvgChart() {
   }, [width, height, svgRef]);
 
   return (
-    <div className="App">
-      <div className="Title">SVG Chart</div>
-      <div className="SubTitle" style={{ marginBottom: 30 }}>
-        More on{" "}
-        <a href="https://observablehq.com/@d3/multitouch">
-          Multitouch done right
-        </a>
-      </div>
-      <svg ref={svgRef} overflow="visible">
-        <g className="xAxis" />
-        <g className="yAxis" />
-      </svg>
+    <div>
+      <svg ref={svgRef} overflow="visible"></svg>
       <div style={{ marginTop: 30 }}>
         {values ? `${values[0]}, ${values[1]}` : "0, 0"}
       </div>
