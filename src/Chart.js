@@ -9,8 +9,6 @@ function SvgChart() {
   const width = viewportWidth * 0.5;
   const height = viewportHeight * 0.5;
   const svgRef = useRef();
-  const isClicked = useRef(false);
-  const position = useRef();
   const [values, setValues] = useState();
 
   useEffect(() => {
@@ -27,20 +25,20 @@ function SvgChart() {
     const domain = [xMin, xMax];
     const range = [yMin, yMax];
 
-    const getValue = (value) => {
-      switch (true) {
-        case value > xMax:
-          return xMax;
-        case value > 1000000:
-          return `${(value / 1000000).toFixed(2)}M`;
-        case value > 1000:
-          return `${(value / 1000).toFixed(0)},000`;
-        case value > xMin:
-          return value.toFixed(0);
-        default:
-          return 0;
-      }
-    };
+    // const getValue = (value) => {
+    //   switch (true) {
+    //     case value > xMax:
+    //       return xMax;
+    //     case value > 1000000:
+    //       return `${(value / 1000000).toFixed(2)}M`;
+    //     case value > 1000:
+    //       return `${(value / 1000).toFixed(0)},000`;
+    //     case value > xMin:
+    //       return value.toFixed(0);
+    //     default:
+    //       return 0;
+    //   }
+    // };
 
     const xScale = scaleLinear().domain(domain).range([0, width]);
     const yScale = scaleLinear().domain(range).range([height, 0]);
@@ -87,59 +85,52 @@ function SvgChart() {
       const dot = svg.append("g").attr("display", "none");
       dot.append("circle").attr("r", 2.5);
 
-      const onEnter = () => {
-        isClicked.current = false;
-        svg
-          .selectAll(".line")
-          .style("mix-blend-mode", null)
-          .attr("stroke", "#ddd");
-        dot.attr("display", null).attr("fill", "steelblue");
-        xRule.attr("display", null).attr("stroke", "steelblue");
-        yRule.attr("display", null).attr("stroke", "steelblue");
-      };
-
-      const onDown = () => {
-        console.log("down");
-      };
-
-      const onClick = (event) => {
-        console.log("click");
-        const cursorPosition = pointers(event)[0];
-        const [x, y] = cursorPosition;
-        if (position.current) {
-          dot.attr("transform", `translate(${x},${y})`);
-        }
-        isClicked.current = true;
-        position.current = cursorPosition;
-      };
-
-      const onMove = (event) => {
-        event.preventDefault();
-        const cursorPosition = pointers(event)[0];
-        const [x, y] = cursorPosition;
-        setValues([getValue(xScale.invert(x)), getValue(yScale.invert(y))]);
-        xRule.attr("transform", `translate(${x},0)`);
-        yRule.attr("transform", `translate(0,${y})`);
-        if (!isClicked.current) {
-          dot.attr("transform", `translate(${x},${y})`);
+      const withinBounds = (arr) => {
+        switch (true) {
+          case arr[0] < 0:
+            return false;
+          case arr[0] > width:
+            return false;
+          case arr[1] < 0:
+            return false;
+          case arr[1] > height:
+            return false;
+          default:
+            return true;
         }
       };
 
-      const onUp = () => {
-        console.log("up");
-      };
+      const onEvent = (event) => {
+        if (event.cancelable) {
+          event.preventDefault();
+        }
+        const type = event.type;
 
-      const onOut = () => {
-        console.log("out");
-        svg
-          .selectAll(".line")
-          .style("mix-blend-mode", "multiply")
-          .attr("stroke", null);
-        if (!isClicked.current) {
+        if (["mouseenter", "pointerenter"].includes(type)) {
+          svg.selectAll(".line").attr("stroke", "#ddd");
+          xRule.attr("display", null).attr("stroke", "steelblue");
+          yRule.attr("display", null).attr("stroke", "steelblue");
+          dot.attr("display", null).attr("fill", "steelblue");
+        }
+        if (["mousedown", "pointerdown", "touchstart"].includes(type)) {
+        }
+        if (["mousemove", "pointermove", "touchmove"].includes(type)) {
+          const [x, y] = pointers(event)[0];
+          if (withinBounds([x, y])) {
+            setValues([x, y]);
+            xRule.attr("transform", `translate(${x},0)`);
+            yRule.attr("transform", `translate(0,${y})`);
+            dot.attr("transform", `translate(${x},${y})`);
+          }
+        }
+        if (["mouseup", "pointerup", "touchend", "click"].includes(type)) {
+          svg.selectAll(".line").attr("stroke", "steelblue");
+          xRule.attr("display", "none");
+          yRule.attr("display", "none");
           dot.attr("display", "none");
         }
-        xRule.attr("display", "none");
-        yRule.attr("display", "none");
+        if (["mouseout", "pointerout"].includes(type)) {
+        }
       };
 
       const rect = (g) =>
@@ -148,12 +139,13 @@ function SvgChart() {
           .attr("fill", "transparent")
           .attr("width", width)
           .attr("height", height)
-          .on("mouseenter pointerenter touchstart", onEnter)
-          .on("mousedown pointerdown", onDown)
-          .on("click touchend", onClick)
-          .on("mousemove touchmove pointermove", onMove)
-          .on("mouseup pointerup", onUp)
-          .on("mouseout pointerout", onOut);
+          .on(
+            "click " +
+              "mouseenter mouseout mousedown mouseup mousemove " +
+              "touchstart touchend touchmove " +
+              "pointerenter pointerout pointerup pointerdown pointermove",
+            onEvent
+          );
 
       svg.append("g").call(xAxis);
       svg.append("g").call(yAxis);
@@ -185,7 +177,7 @@ function SvgChart() {
     <div>
       <svg ref={svgRef} overflow="visible"></svg>
       <div style={{ marginTop: 30 }}>
-        {values ? `${values[0]}, ${values[1]}` : "0, 0"}
+        {values ? `${values[0].toFixed(0)}, ${values[1].toFixed(0)}` : "0, 0"}
       </div>
     </div>
   );
