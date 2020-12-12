@@ -12,6 +12,7 @@ function SvgChart() {
   const pointer = useRef();
   const position = useRef();
   const isSet = useRef();
+  const [update, setUpdate] = useState(false);
   const [values, setValues] = useState();
 
   useEffect(() => {
@@ -87,6 +88,15 @@ function SvgChart() {
 
       const dot = svg.append("g").attr("display", "none");
       dot.append("circle").attr("r", 2.5);
+      if (position.current) {
+        const [x, y] = position.current;
+        console.log(x, y);
+        dot
+          .attr("display", null)
+          .attr("fill", "steelblue")
+          .attr("cx", x)
+          .attr("cy", y);
+      }
 
       const withinBounds = (arr) => {
         switch (true) {
@@ -111,16 +121,16 @@ function SvgChart() {
 
         if (["mouseenter"].includes(type)) {
           svg.selectAll(".line").attr("stroke", "#ddd");
-          xRule.attr("display", null).attr("stroke", "steelblue");
-          yRule.attr("display", null).attr("stroke", "steelblue");
-          dot.attr("display", null).attr("fill", "steelblue");
+          // xRule.attr("display", null).attr("stroke", "steelblue");
+          // yRule.attr("display", null).attr("stroke", "steelblue");
+          // dot.attr("display", null).attr("fill", "steelblue");
         }
         if (["touchstart", "mousedown"].includes(type)) {
           console.log("start");
           svg.selectAll(".line").attr("stroke", "#ddd");
-          xRule.attr("display", null).attr("stroke", "steelblue");
-          yRule.attr("display", null).attr("stroke", "steelblue");
-          dot.attr("display", null).attr("fill", "steelblue");
+          // xRule.attr("display", null).attr("stroke", "steelblue");
+          // yRule.attr("display", null).attr("stroke", "steelblue");
+          // dot.attr("display", null).attr("fill", "steelblue");
         }
         if (["touchmove", "mousemove"].includes(type)) {
           console.log("moving");
@@ -129,10 +139,19 @@ function SvgChart() {
             setValues([x, y]);
             pointer.current = [x, y];
             position.current = [x, y];
-            xRule.attr("transform", `translate(${x},0)`);
-            yRule.attr("transform", `translate(0,${y})`);
+            xRule
+              .attr("display", null)
+              .attr("stroke", "steelblue")
+              .attr("transform", `translate(${x},0)`);
+            yRule
+              .attr("display", null)
+              .attr("stroke", "steelblue")
+              .attr("transform", `translate(0,${y})`);
             if (!isSet.current) {
-              dot.attr("transform", `translate(${x},${y})`);
+              dot
+                .attr("display", null)
+                .attr("stroke", "steelblue")
+                .attr("transform", `translate(${x},${y})`);
             }
           } else {
             position.current = null;
@@ -153,6 +172,8 @@ function SvgChart() {
             xRule.attr("display", "none");
             yRule.attr("display", "none");
           }
+          console.log("updating");
+          setUpdate((prev) => !prev);
         }
         if (["mouseout"].includes(type)) {
           svg.selectAll(".line").attr("stroke", "steelblue");
@@ -202,7 +223,7 @@ function SvgChart() {
       svg.call(path);
     };
     chart();
-  }, [width, height, svgRef, isSet]);
+  }, [width, height, svgRef, update]);
 
   return (
     <div>
