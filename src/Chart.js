@@ -203,7 +203,6 @@ function SvgChart() {
           .data([data])
           .join("path")
           .attr("class", "line")
-          .style("mix-blend-mode", "multiply")
           .attr("d", (d) => getLine(d))
           .attr("pointer-events", "none");
       };
