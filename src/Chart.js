@@ -119,19 +119,11 @@ function SvgChart() {
 
         if (["mouseenter"].includes(type)) {
           svg.selectAll(".line").attr("stroke", "#ddd");
-          // xRule.attr("display", null).attr("stroke", "steelblue");
-          // yRule.attr("display", null).attr("stroke", "steelblue");
-          // dot.attr("display", null).attr("fill", "steelblue");
         }
         if (["touchstart", "mousedown"].includes(type)) {
-          console.log("start");
           svg.selectAll(".line").attr("stroke", "#ddd");
-          // xRule.attr("display", null).attr("stroke", "steelblue");
-          // yRule.attr("display", null).attr("stroke", "steelblue");
-          // dot.attr("display", null).attr("fill", "steelblue");
         }
         if (["touchmove", "mousemove"].includes(type)) {
-          console.log("moving");
           const [x, y] = pointers(event)[0];
           if (withinBounds([x, y])) {
             setValues([x, y]);
@@ -156,7 +148,6 @@ function SvgChart() {
           }
         }
         if (["touchend", "click", "mouseup"].includes(type)) {
-          console.log("end");
           if (position.current && isSet.current) {
             const [x, y] = pointer.current;
             dot.attr("transform", `translate(${x},${y})`);
@@ -170,7 +161,6 @@ function SvgChart() {
             xRule.attr("display", "none");
             yRule.attr("display", "none");
           }
-          console.log("updating");
           setUpdate((prev) => !prev);
         }
         if (["mouseout"].includes(type)) {
