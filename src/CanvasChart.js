@@ -106,7 +106,9 @@ function CanvasChart() {
           setIsEntered(true);
           setIsClicked(false);
         }
-        if (["touchstart", "mousedown"].includes(type)) setIsDown(true);
+        if (["touchstart", "mousedown"].includes(type)) {
+          setIsDown(true);
+        }
         if (type === "click") {
           setIsClicked(true);
           setPosition(pointers(event)[0]);
@@ -121,8 +123,9 @@ function CanvasChart() {
             }
           }
         }
-
-        if (["touchend", "mouseup"].includes(type)) setIsDown(false);
+        if (["touchend", "mouseup"].includes(type)) {
+          setIsDown(false);
+        }
         if (["mouseout"].includes(type)) {
           setIsEntered(false);
           setIsDown(false);
@@ -184,7 +187,7 @@ function CanvasChart() {
         context.fill();
       }
 
-      if (isEntered) {
+      if (isEntered || isDown) {
         for (const { x1, y1, x2, y2, color } of lines) {
           context.beginPath();
           context.moveTo(x1, y1);
@@ -198,7 +201,9 @@ function CanvasChart() {
       requestAnimationFrame(draw);
     }
     requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(draw);
+    return () => {
+      cancelAnimationFrame(draw);
+    };
   }, [
     width,
     height,

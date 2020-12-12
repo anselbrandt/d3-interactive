@@ -29,20 +29,20 @@ function SvgChart() {
     const domain = [xMin, xMax];
     const range = [yMin, yMax];
 
-    // const getValue = (value) => {
-    //   switch (true) {
-    //     case value > xMax:
-    //       return xMax;
-    //     case value > 1000000:
-    //       return `${(value / 1000000).toFixed(2)}M`;
-    //     case value > 1000:
-    //       return `${(value / 1000).toFixed(0)},000`;
-    //     case value > xMin:
-    //       return value.toFixed(0);
-    //     default:
-    //       return 0;
-    //   }
-    // };
+    const getValue = (value) => {
+      switch (true) {
+        case value > xMax:
+          return xMax;
+        case value > 1000000:
+          return `${(value / 1000000).toFixed(2)}M`;
+        case value > 1000:
+          return `${(value / 1000).toFixed(0)},000`;
+        case value > xMin:
+          return value.toFixed(0);
+        default:
+          return 0;
+      }
+    };
 
     const xScale = scaleLinear().domain(domain).range([0, width]);
     const yScale = scaleLinear().domain(range).range([height, 0]);
@@ -126,7 +126,7 @@ function SvgChart() {
         if (["touchmove", "mousemove"].includes(type)) {
           const [x, y] = pointers(event)[0];
           if (withinBounds([x, y])) {
-            setValues([x, y]);
+            setValues([getValue(xScale.invert(x)), getValue(yScale.invert(y))]);
             pointer.current = [x, y];
             position.current = [x, y];
             xRule
@@ -224,7 +224,7 @@ function SvgChart() {
       </div>
       <svg ref={svgRef} overflow="visible"></svg>
       <div style={{ marginTop: 30 }}>
-        {values ? `${values[0].toFixed(0)}, ${values[1].toFixed(0)}` : "0, 0"}
+        {values ? `${values[0]}, ${values[1]}` : "0, 0"}
       </div>
     </div>
   );
