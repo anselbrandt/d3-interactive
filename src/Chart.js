@@ -90,12 +90,10 @@ function SvgChart() {
       dot.append("circle").attr("r", 2.5);
       if (position.current) {
         const [x, y] = position.current;
-        console.log(x, y);
         dot
           .attr("display", null)
           .attr("fill", "steelblue")
-          .attr("cx", x)
-          .attr("cy", y);
+          .attr("transform", `translate(${x},${y})`);
       }
 
       const withinBounds = (arr) => {

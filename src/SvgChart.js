@@ -85,7 +85,6 @@ function SvgChart() {
         .attr("y2", 0);
 
       const dot = svg.append("g").attr("display", "none");
-      dot.append("circle").attr("r", 2.5);
 
       const onEnter = () => {
         isClicked.current = false;
@@ -93,7 +92,6 @@ function SvgChart() {
           .selectAll(".line")
           .style("mix-blend-mode", null)
           .attr("stroke", "#ddd");
-        dot.attr("display", null).attr("fill", "steelblue");
         xRule.attr("display", null).attr("stroke", "steelblue");
         yRule.attr("display", null).attr("stroke", "steelblue");
       };
