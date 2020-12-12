@@ -1,23 +1,21 @@
 import React from "react";
 import "./App.css";
-// import MultilineChart from "./MultilineChart";
-// import CanvasChart from "./CanvasChart";
+import MultilineChart from "./MultilineChart";
+import CanvasChart from "./CanvasChart";
 import Chart from "./Chart";
 
 function App() {
   return (
     <div className="App">
-      <Chart />
-      {/* <div className="Title">React D3 Charts</div>
-      <div className="SubTitle" style={{ marginBottom: 30 }}>
-        SVG, Canvas and Multiline
-      </div>
-      <div style={{ margin: 30 }}>
+      <div>
         <MultilineChart />
       </div>
-      <div style={{ margin: 30 }}>
+      <div>
+        <Chart />
+      </div>
+      <div>
         <CanvasChart />
-      </div> */}
+      </div>
     </div>
   );
 }

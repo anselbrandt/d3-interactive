@@ -215,6 +215,13 @@ function SvgChart() {
 
   return (
     <div>
+      <div className="Title">SVG Chart</div>
+      <div className="SubTitle" style={{ marginBottom: 30 }}>
+        More on{" "}
+        <a href="https://observablehq.com/@d3/multitouch">
+          Multitouch done right
+        </a>
+      </div>
       <svg ref={svgRef} overflow="visible"></svg>
       <div style={{ marginTop: 30 }}>
         {values ? `${values[0].toFixed(0)}, ${values[1].toFixed(0)}` : "0, 0"}
